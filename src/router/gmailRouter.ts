@@ -12,22 +12,26 @@ router.get("/auth/google", async (req, res) => {
     const authUrl = await generateAuthUrl();
     res.redirect(authUrl);
   } catch (error) {
-    res.status(500);
+    res.status(500).send(error);
   }
 });
 
 router.get("/auth/google/callback", async (req, res) => {
   try {
     const result = await handleGoogleCallback({ code: req.query });
-    res.send(result);
-  } catch (error) {}
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).send(error);
+  }
 });
 
 router.get("/fetch/:email", async (req, res) => {
   try {
     const result = await fetchAllEmails({ email: req.params.email });
-    res.send(result);
-  } catch (error) {}
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).send(error);
+  }
 });
 
 export default router;

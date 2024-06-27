@@ -64,24 +64,13 @@ export async function handleGoogleCallback({
   try {
     const { tokens } = await oAuth2Client.getToken(code);
     const { access_token, refresh_token, scope } = tokens;
+
     if (!access_token) throw new Error("Cannot retrieve access token");
     accessToken = access_token;
+
     if (!scope) throw new Error("Scope not found");
+
     return "Restricted scopes test passed.";
-  } catch (error) {
-    throw error;
-  }
-}
-
-export async function getUserProfile({ email }: { email: string }) {
-  try {
-    const url = `https://gmail.googleapis.com/gmail/v1/users/${email}/profile`;
-    const token = accessToken;
-    if (!token) throw new Error("Token not found! Login again");
-    const config: AxiosRequestConfig = createConfig(url, token);
-    const response: AxiosResponse = await axios(config);
-
-    return response.data;
   } catch (error) {
     throw error;
   }
@@ -162,7 +151,7 @@ export async function fetchAllEmails({
 
     return "Successful";
   } catch (error) {
-    throw new error();
+    throw error;
   }
 }
 
@@ -241,6 +230,7 @@ async function sendEmail({
       }
     );
   } catch (error) {
+    throw error;
   }
 }
 
@@ -248,6 +238,7 @@ function extractSenderId({ rawString }: { rawString: string }): string {
   const emailRegex = /<([^>]+)>/;
   const match = emailRegex.exec(rawString) ?? "";
   const extractedEmail = match[1].trim();
+
   return extractedEmail;
 }
 
@@ -258,21 +249,24 @@ async function createLabelOnGmail({
   email: string;
   label: string;
 }): Promise<any> {
-  try {
-    const url = `https://gmail.googleapis.com/gmail/v1/users/${email}/labels`;
+  const url = `https://gmail.googleapis.com/gmail/v1/users/${email}/labels`;
 
-    const token = accessToken;
-    const data = {
-      name: label,
-    };
+  const token = accessToken;
+  const data = {
+    name: label,
+  };
+
+  try {
     const response = await axios.post(url, data, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
+
     return response.data;
   } catch (error) {
+    throw error;
   }
 }
 
@@ -283,7 +277,13 @@ async function getGmailLabels({ email }: { email: string }): Promise<any> {
     throw new Error("Token not found , Please login again to get token");
   }
   const config: AxiosRequestConfig = createConfig(url, token);
-  const response: AxiosResponse = await axios(config);
+
+  let response: AxiosResponse;
+  try {
+    response = await axios(config);
+  } catch (error) {
+    throw error;
+  }
 
   return response.data.labels;
 }
@@ -312,6 +312,7 @@ async function changeEmailLabel({
       }
     );
   } catch (error) {
+    throw error;
   }
 }
 
@@ -353,11 +354,14 @@ export async function readMail({
   try {
     const url = `https://gmail.googleapis.com/gmail/v1/users/${email}/messages/${messageId}`;
     const token = accessToken;
+
     if (!token) {
       throw new Error("Token not found , Please login again to get token");
     }
+
     const config: AxiosRequestConfig = createConfig(url, token);
     const response: AxiosResponse = await axios(config);
+
     return response.data;
   } catch (error) {
     throw error;
