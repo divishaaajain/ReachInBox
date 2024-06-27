@@ -4,9 +4,9 @@
 
 2. git clone https://github.com/divishaaajain/ReachInBox.git
 
-3. run npm install -> to install node modules
+3. run "npm install" -> to install node modules
 
-4. run npm start -> to start the server
+4. run "npm run dev" -> to start the development server
 
 5. Create account on Google api console and get the credentials
 
