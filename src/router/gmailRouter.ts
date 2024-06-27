@@ -23,7 +23,7 @@ router.get("/auth/google/callback", async (req, res) => {
   } catch (error) {}
 });
 
-router.get("/list/:email", async (req, res) => {
+router.get("/fetch/:email", async (req, res) => {
   try {
     const result = await fetchAllEmails({ email: req.params.email });
     res.send(result);
